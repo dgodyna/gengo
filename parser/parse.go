@@ -72,6 +72,10 @@ type Builder struct {
 
 	// map of package to list of packages it imports.
 	importGraph map[importPathString]map[string]struct{}
+
+	allowedImports []string
+
+	processedPackages map[string]bool
 }
 
 // parsedFile is for tracking files with name
@@ -86,8 +90,16 @@ type fileLine struct {
 	line int
 }
 
+type BuilderOptions func(*Builder)
+
+func AllowedImports(imports []string) BuilderOptions {
+	return func(builder *Builder) {
+		builder.allowedImports = imports
+	}
+}
+
 // New constructs a new builder.
-func New() *Builder {
+func New(options ...BuilderOptions) *Builder {
 	c := build.Default
 	if c.GOROOT == "" {
 		if p, err := exec.Command("which", "go").CombinedOutput(); err == nil {
@@ -100,7 +112,7 @@ func New() *Builder {
 	// Force this to off, since we don't properly parse CGo.  All symbols must
 	// have non-CGo equivalents.
 	c.CgoEnabled = false
-	return &Builder{
+	b := &Builder{
 		context:               &c,
 		buildPackages:         map[string]*build.Package{},
 		typeCheckedPackages:   map[importPathString]*tc.Package{},
@@ -110,7 +122,13 @@ func New() *Builder {
 		userRequested:         map[importPathString]bool{},
 		endLineToCommentGroup: map[fileLine]*ast.CommentGroup{},
 		importGraph:           map[importPathString]map[string]struct{}{},
+		processedPackages:     map[string]bool{},
 	}
+
+	for _, o := range options {
+		o(b)
+	}
+	return b
 }
 
 // AddBuildTags adds the specified build tags to the parse context.
@@ -224,6 +242,22 @@ func (b *Builder) AddDir(dir string) error {
 // subdirectories; it returns an error only if the path couldn't be resolved;
 // any directories recursed into without go source are ignored.
 func (b *Builder) AddDirRecursive(dir string) error {
+
+	var doImport = true
+	if len(b.allowedImports) != 0 {
+		doImport = false
+		for _, pkg := range b.allowedImports {
+			if strings.HasPrefix(dir, pkg) {
+				doImport = true
+				break
+			}
+		}
+	}
+	if !doImport {
+		klog.V(5).Infof("importPackage %s skipped", dir)
+		return nil
+	}
+
 	// Add the root.
 	if _, err := b.importPackage(dir, true); err != nil {
 		klog.Warningf("Ignoring directory %v: %v", dir, err)
@@ -265,6 +299,21 @@ func (b *Builder) AddDirRecursive(dir string) error {
 // Deprecated. Please use AddDirectoryTo.
 func (b *Builder) AddDirTo(dir string, u *types.Universe) error {
 	// We want all types from this package, as if they were directly added
+	var doImport = true
+	if len(b.allowedImports) != 0 {
+		doImport = false
+		for _, pkg := range b.allowedImports {
+			if strings.HasPrefix(pkg, dir) {
+				doImport = true
+				break
+			}
+		}
+	}
+	if !doImport {
+		klog.V(5).Infof("importPackage %s skipped", dir)
+		return nil
+	}
+
 	// by the user.  They WERE added by the user, in effect.
 	if _, err := b.importPackage(dir, true); err != nil {
 		return err
@@ -284,6 +333,21 @@ func (b *Builder) AddDirTo(dir string, u *types.Universe) error {
 func (b *Builder) AddDirectoryTo(dir string, u *types.Universe) (*types.Package, error) {
 	// We want all types from this package, as if they were directly added
 	// by the user.  They WERE added by the user, in effect.
+	var doImport = true
+	if len(b.allowedImports) != 0 {
+		doImport = false
+		for _, pkg := range b.allowedImports {
+			if strings.HasPrefix(dir, pkg) {
+				doImport = true
+				break
+			}
+		}
+	}
+	if !doImport {
+		klog.V(5).Infof("importPackage %s skipped", dir)
+		return nil, nil
+	}
+
 	if _, err := b.importPackage(dir, true); err != nil {
 		return nil, err
 	}
@@ -354,6 +418,26 @@ func isErrPackageNotFound(err error) bool {
 // importPackage is a function that will be called by the type check package when it
 // needs to import a go package. 'path' is the import path.
 func (b *Builder) importPackage(dir string, userRequested bool) (*tc.Package, error) {
+
+	var doImport = true
+	if len(b.allowedImports) != 0 {
+		_, processed := b.processedPackages[dir]
+		if processed {
+			return nil, nil
+		}
+		doImport = false
+		for _, pkg := range b.allowedImports {
+			if strings.HasPrefix(dir, pkg) {
+				doImport = true
+				break
+			}
+		}
+	}
+	if !doImport {
+		klog.V(5).Infof("importPackage %s skipped", dir)
+		return nil, nil
+	}
+
 	klog.V(5).Infof("importPackage %s", dir)
 	var pkgPath = importPathString(dir)
 
