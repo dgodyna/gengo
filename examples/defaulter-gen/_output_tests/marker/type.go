@@ -17,7 +17,7 @@ limitations under the License.
 package marker
 
 import (
-	"k8s.io/gengo/examples/defaulter-gen/_output_tests/empty"
+	"github.com/dgodyna/gengo/examples/defaulter-gen/_output_tests/empty"
 )
 
 type Defaulted struct {

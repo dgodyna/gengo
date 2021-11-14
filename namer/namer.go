@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"strings"
 
-	"k8s.io/gengo/types"
+	"github.com/dgodyna/gengo/types"
 )
 
 const (

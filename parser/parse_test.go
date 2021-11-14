@@ -28,15 +28,15 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
-	"k8s.io/gengo/args"
-	"k8s.io/gengo/namer"
-	"k8s.io/gengo/parser"
-	"k8s.io/gengo/types"
+	"github.com/dgodyna/gengo/args"
+	"github.com/dgodyna/gengo/namer"
+	"github.com/dgodyna/gengo/parser"
+	"github.com/dgodyna/gengo/types"
 )
 
 func TestRecursive(t *testing.T) {
 	d := args.Default()
-	d.InputDirs = []string{"k8s.io/gengo/testdata/a/..."}
+	d.InputDirs = []string{"github.com/dgodyna/gengo/testdata/a/..."}
 	b, err := d.NewBuilder()
 	if err != nil {
 		t.Fatalf("Fail making builder: %v", err)
@@ -49,10 +49,10 @@ func TestRecursive(t *testing.T) {
 	foundC := false
 	for _, p := range b.FindPackages() {
 		t.Logf("Package: %v", p)
-		if p == "k8s.io/gengo/testdata/a/b" {
+		if p == "github.com/dgodyna/gengo/testdata/a/b" {
 			foundB = true
 		}
-		if p == "k8s.io/gengo/testdata/a/c" {
+		if p == "github.com/dgodyna/gengo/testdata/a/c" {
 			foundC = true
 		}
 	}
@@ -67,7 +67,7 @@ func TestRecursive(t *testing.T) {
 func TestRecursiveWithTestGoFiles(t *testing.T) {
 	d := args.Default()
 	d.IncludeTestFiles = true
-	d.InputDirs = []string{"k8s.io/gengo/testdata/a/..."}
+	d.InputDirs = []string{"github.com/dgodyna/gengo/testdata/a/..."}
 	b, err := d.NewBuilder()
 	if err != nil {
 		t.Fatalf("Fail making builder: %v", err)
@@ -80,10 +80,10 @@ func TestRecursiveWithTestGoFiles(t *testing.T) {
 	foundC := false
 	for _, p := range b.FindPackages() {
 		t.Logf("Package: %v", p)
-		if p == "k8s.io/gengo/testdata/a/b" {
+		if p == "github.com/dgodyna/gengo/testdata/a/b" {
 			foundB = true
 		}
-		if p == "k8s.io/gengo/testdata/a/c" {
+		if p == "github.com/dgodyna/gengo/testdata/a/c" {
 			foundC = true
 		}
 	}

@@ -19,7 +19,7 @@ package namer
 import (
 	"sort"
 
-	"k8s.io/gengo/types"
+	"github.com/dgodyna/gengo/types"
 )
 
 // Orderer produces an ordering of types given a Namer.

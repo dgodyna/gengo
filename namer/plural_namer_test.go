@@ -19,7 +19,7 @@ package namer
 import (
 	"testing"
 
-	"k8s.io/gengo/types"
+	"github.com/dgodyna/gengo/types"
 )
 
 func TestPluralNamer(t *testing.T) {

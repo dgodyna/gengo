@@ -25,9 +25,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/dgodyna/gengo/namer"
+	"github.com/dgodyna/gengo/types"
 	"golang.org/x/tools/imports"
-	"k8s.io/gengo/namer"
-	"k8s.io/gengo/types"
 
 	"k8s.io/klog/v2"
 )

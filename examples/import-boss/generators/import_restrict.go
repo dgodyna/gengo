@@ -29,10 +29,10 @@ import (
 	"sort"
 	"strings"
 
-	"k8s.io/gengo/args"
-	"k8s.io/gengo/generator"
-	"k8s.io/gengo/namer"
-	"k8s.io/gengo/types"
+	"github.com/dgodyna/gengo/args"
+	"github.com/dgodyna/gengo/generator"
+	"github.com/dgodyna/gengo/namer"
+	"github.com/dgodyna/gengo/types"
 	"sigs.k8s.io/yaml"
 
 	"k8s.io/klog/v2"

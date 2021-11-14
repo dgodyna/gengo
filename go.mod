@@ -1,4 +1,4 @@
-module k8s.io/gengo
+module github.com/dgodyna/gengo
 
 go 1.13
 

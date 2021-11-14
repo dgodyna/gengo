@@ -4,15 +4,15 @@
 
 [Travis]: https://travis-ci.org/kubernetes/gengo
 [Travis Widget]: https://travis-ci.org/kubernetes/gengo.svg?branch=master
-[GoDoc]: https://godoc.org/k8s.io/gengo
-[GoDoc Widget]: https://godoc.org/k8s.io/gengo?status.svg
+[GoDoc]: https://godoc.org/github.com/dgodyna/gengo
+[GoDoc Widget]: https://godoc.org/github.com/dgodyna/gengo?status.svg
 [GoReport]: https://goreportcard.com/badge/github.com/kubernetes/gengo
 [GoReportStatus]: https://goreportcard.com/report/github.com/kubernetes/gengo
 
 A package for generating things based on go files. This mechanism was first used
 in Kubernetes and is split out here for ease of reuse and maintainability.
 
-`go get k8s.io/gengo/...`
+`go get github.com/dgodyna/gengo/...`
 
 ## Examples
 
